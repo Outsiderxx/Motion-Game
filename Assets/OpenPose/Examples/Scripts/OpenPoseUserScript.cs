@@ -1,6 +1,8 @@
 ﻿// OpenPose Unity Plugin v1.0.0alpha-1.5.0
+using Project2;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -72,8 +74,13 @@ namespace OpenPose.Example
         private float avgFrameRate = 0f;
         private int frameCounter = 0;
 
+        public GameObject PlayerText2;
+        public GameObject ReplayBtn;
+
         private void Start()
         {
+            GetGameSettings();
+
             // Register callbacks
             OPWrapper.OPRegisterCallbacks();
             // Enable OpenPose log to unity (default true)
@@ -89,8 +96,44 @@ namespace OpenPose.Example
 
             // Start OpenPose
             OPWrapper.OPRun();
+
+          
         }
 
+        private void GetGameSettings()
+        {
+            if (GameSettings.Instance.isEvaluationMode)
+            {
+                if (GameSettings.Instance.isVideo)
+                {
+                    inputType = ProducerType.Video;
+                    producerString = Path.Combine(Application.streamingAssetsPath, "Videos/" + GameSettings.Instance.videoPath);
+                    ReplayBtn.SetActive(true);
+                }
+                else
+                {
+                    inputType = ProducerType.Webcam;
+                    producerString = "-1";
+                }
+
+                if (GameSettings.Instance.isSinglePlayer)
+                {
+                    maxPeople = 1;
+                }
+                else
+                {
+                    maxPeople = 2;
+                    PlayerText2.SetActive(true);
+                }
+            }
+            else
+            {
+                 inputType = ProducerType.Webcam;
+                producerString = "-1";
+                maxPeople = 1;
+            }
+          
+        }
         // Parameters can be set here
         private void UserConfigureOpenPose()
         {

@@ -1,5 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
 using System.IO;
+using UnityEngine;
 
 namespace Project2
 {
@@ -14,6 +15,9 @@ namespace Project2
         private BVHParser _bvhData;
         private int _currentFrameIndex;
         private float currentTime = 0;
+        public bool isPlaying = false;
+
+        public System.Action isEnd;
 
         public BVHParser bvhData
         {
@@ -37,6 +41,10 @@ namespace Project2
                 }
                 if (value >= this._bvhData.frames)
                 {
+                    if (this.isEnd != null)
+                    {
+                        this.isEnd.Invoke();
+                    }
                     if (!isRepeat)
                     {
                         return;
@@ -47,6 +55,10 @@ namespace Project2
                 else
                 {
                     this._currentFrameIndex = value;
+                }
+                if (value == 0)
+                {
+                    this.currentTime = 0;
                 }
                 this.OnFrameIndexUpdate();
             }
@@ -59,6 +71,13 @@ namespace Project2
             _bvhData = new BVHParser(bvhString);
         }
 
+        public void LoadBvh(string str)
+        {
+
+            string bvhString = File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "BVHFiles/" + str));
+            _bvhData = new BVHParser(bvhString);
+        }
+
         // Update is called once per frame
         private void Update()
         {
@@ -66,8 +85,16 @@ namespace Project2
             {
                 return;
             }
-            this.currentTime += Time.deltaTime * speed;
-            this.currentFrameIndex = (int)(this.currentTime / this._bvhData.frameTime);
+            if (isPlaying)
+            {
+                this.currentTime += Time.deltaTime * speed;
+                this.currentFrameIndex = (int)(this.currentTime / this._bvhData.frameTime);
+            }
+            else
+            {
+                this.currentTime = 0;
+                this.currentFrameIndex = 0;
+            }
         }
 
         private void OnFrameIndexUpdate()

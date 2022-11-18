@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 
 namespace Project2
 {
@@ -155,10 +154,6 @@ namespace Project2
                     correctJointNumber++;
                 }
 
-            }
-            if ((float)correctJointNumber / MyData.PoseKeypointsCount > 0.6)
-            {
-                Debug.Log("debug");
             }
             return (float)correctJointNumber / MyData.PoseKeypointsCount;
         }
